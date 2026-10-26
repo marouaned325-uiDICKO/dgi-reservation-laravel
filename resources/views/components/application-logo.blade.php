@@ -1,0 +1,1 @@
+<img src="{{ asset('images/logo_dgi.jpeg') }}" alt="Logo DGI" {{ $attributes->merge(['class' => 'h-16']) }}>

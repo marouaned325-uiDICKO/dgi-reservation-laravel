@@ -1,0 +1,21 @@
+{
+    "Email": "Adresse email",
+    "Password": "Mot de passe",
+    "Remember me": "Se souvenir de moi",
+    "Forgot your password?": "Mot de passe oublié ?",
+    "Log in": "Se connecter",
+    "Log Out": "Se déconnecter",
+    "Register": "S'inscrire",
+    "Already registered?": "Déjà inscrit ?",
+    "Name": "Nom",
+    "Confirm Password": "Confirmer le mot de passe",
+    "Confirm": "Confirmer",
+    "Reset Password": "Réinitialiser le mot de passe",
+    "Email Password Reset Link": "Envoyer le lien de réinitialisation",
+    "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "Mot de passe oublié ? Aucun problème. Indiquez-nous votre adresse email et nous vous enverrons un lien pour en choisir un nouveau.",
+    "This is a secure area of the application. Please confirm your password before continuing.": "Ceci est une zone sécurisée de l'application. Veuillez confirmer votre mot de passe avant de continuer.",
+    "Save": "Enregistrer",
+    "Saved.": "Enregistré.",
+    "Profile": "Profil",
+    "Dashboard": "Tableau de bord"
+}
