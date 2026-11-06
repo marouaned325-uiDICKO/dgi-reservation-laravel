@@ -30,3 +30,5 @@ Thumbs.db
 *.docx
 ~$*
 public/images/salles/Attestation_*.pdf
+*.lnk
+storage/ancien_code/
