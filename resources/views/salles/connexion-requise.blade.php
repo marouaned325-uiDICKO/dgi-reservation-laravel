@@ -11,7 +11,7 @@
         </p>
         <div style="display: flex; gap: 10px; justify-content: center;">
             <a href="{{ route('login') }}" style="padding: 10px 20px; background: ##1F6B41; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">Se connecter</a>
-            <a href="{{ route('register') }}" style="padding: 10px 20px; background: #f0f0f0; color: #333; border-radius: 4px; text-decoration: none; font-size: 14px;">Créer un compte</a>
+<a href="{{ route('register') }}" style="padding: 10px 20px; background: #f0f0f0; color: #333; border-radius: 4px; text-decoration: none; font-size: 14px;">Créer un compte</a>
         </div>
         <a href="{{ route('salles.galerie') }}" style="display: inline-block; margin-top: 20px; color: #666; font-size: 13px;">← Retour aux salles</a>
     </div>
