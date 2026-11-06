@@ -66,7 +66,7 @@ class UserController extends Controller
 
     /**
      * Envoie un email sans jamais bloquer l'action en cas d'échec.
-     * Retourne true si l'email est parti, false sinon (l'erreur est écrite dans le log).
+     * Retourne true si l'email est parti (ou mis en file d'attente), false sinon (l'erreur est écrite dans le log).
      */
     private function envoyerEmail(string $destinataire, Mailable $mail): bool
     {
@@ -79,7 +79,7 @@ class UserController extends Controller
         }
     }
 
-    /** Lien sécurisé (3 jours) qui mène l'utilisateur à la page « Choisir mon mot de passe ». */
+    /** Lien sécurisé (3 jours) qui connecte l'utilisateur puis l'envoie sur la page « Changer le mot de passe ». */
     private function lienActivation(User $user): string
     {
         return URL::temporarySignedRoute('compte.activation', now()->addDays(3), ['user' => $user->id]);
@@ -159,14 +159,14 @@ class UserController extends Controller
             'doit_changer_mot_de_passe' => true,
         ]);
 
-        // Courriel n° 1 : création du compte
+        // Courriel de création de compte, avec le lien pour choisir le mot de passe
         if ($this->envoyerEmail($user->email, new CompteCree($user, $this->lienActivation($user)))) {
             return redirect()->route('admin.users.index')
                 ->with('success', "Utilisateur ajouté avec succès. Un lien pour choisir son mot de passe a été envoyé à {$user->email}.");
         }
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Utilisateur ajouté avec succès, mais l'email n'a pas pu être envoyé.");
+            ->with('success', "Utilisateur ajouté avec succès, mais l'email n'a pas pu être envoyé. Utilisez « Réactiver » plus tard ou contactez l'administrateur système.");
     }
 
     public function edit(User $user)
@@ -252,7 +252,7 @@ class UserController extends Controller
 
         $user->forceFill(['created_at' => now()])->save();
 
-        // Courriel n° 2 : réactivation, avec un nouveau lien si le mot de passe n'a jamais été choisi
+        // Nouveau lien si le mot de passe n'a jamais été choisi
         if ($user->doit_changer_mot_de_passe) {
             $this->envoyerEmail($user->email, new CompteCree($user, $this->lienActivation($user)));
         }
@@ -287,10 +287,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        // Courriel n° 1 : mis en file d'attente, envoyé en arrière-plan
-        $this->envoyerEmail($user->email, new CompteCree($user, $this->lienActivation($user)));
-
         return redirect()->route('admin.users.index')
-            ->with('success', "Utilisateur ajouté avec succès. Le lien pour choisir son mot de passe est en cours d'envoi à {$user->email}.");
+            ->with('success', "Le compte de {$nom} a été supprimé.");
     }
-        }
+}

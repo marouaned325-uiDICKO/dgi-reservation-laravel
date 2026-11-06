@@ -14,6 +14,7 @@
     input:focus, select:focus { outline: none; border-color: #1A8969; background: white; box-shadow: 0 0 0 3px rgba(26,137,105,.12); }
     .error { color: #d9534f; font-size: 12px; margin-top: 5px; }
     .note-admin { display: none; background: #fff8e1; border: 1px solid #ecd58a; border-left: 5px solid #D4AF37; color: #7a5d05; padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+    .note-info { background: #e8f5ef; border: 1px solid #bfe0d2; border-left: 5px solid #1A8969; color: #146e54; padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
     .buttons { display: flex; gap: 10px; margin-top: 8px; }
     .btn { padding: 11px 26px; border-radius: 20px; text-decoration: none; border: none; cursor: pointer; font-size: 13px; font-weight: 700; font-family: inherit; }
     .btn-save { background: #1A8969; color: white; }
@@ -83,6 +84,9 @@
             Un administrateur a accès à toutes les directions : aucune direction ni service n'est à renseigner.
         </div>
 
+        <div class="note-info">
+            Aucun mot de passe à saisir : l'utilisateur recevra par courriel un lien (valable 3 jours) pour se connecter et choisir le sien.
+        </div>
 
         <div class="buttons">
             <button type="submit" class="btn btn-save">Enregistrer</button>

@@ -145,6 +145,9 @@ Route::middleware('auth')->group(function () {
 
     // Utilisateurs et services : administrateur
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        // Réactivation d'un compte expiré (nouveau délai de 3 jours + nouveau lien)
+        Route::post('users/{user}/reactiver', [UserController::class, 'reactiver'])->name('users.reactiver');
+
         Route::resource('users', UserController::class)->except(['show']);
         Route::resource('services', ServiceController::class)->except(['show']);
     });

@@ -473,7 +473,7 @@ a:focus-visible, button:focus-visible {
     }
 }
 
-/* ===== NOTIFICATION DE SUCCÈS (fenêtre centrée) ===== */
+/* ===== NOTIFICATION DE SUCCÈS (fenêtre centrée : suppressions, réactivations...) ===== */
 .succes-fond {
     position: fixed; inset: 0; z-index: 2000;
     display: flex; align-items: center; justify-content: center;
@@ -511,6 +511,22 @@ a:focus-visible, button:focus-visible {
 @keyframes succesBoite { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
 @keyframes succesBarre { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
+/* ===== BANDEAU DE SUCCÈS (ajouts et modifications : message vert en haut de la page) ===== */
+.bandeau-succes {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    background: #1A8969; color: #fff; border-left: 6px solid #D4AF37; border-radius: 10px;
+    padding: 13px 18px; margin: 0 0 18px; font-size: 14px; font-weight: 600;
+    box-shadow: 0 4px 12px rgba(26, 137, 105, 0.25);
+    animation: bandeauEntree .35s ease; transition: opacity .4s, transform .4s;
+}
+.bandeau-succes.masque { opacity: 0; transform: translateY(-10px); }
+.bandeau-succes button {
+    background: none; border: none; color: #fff; font-size: 22px; line-height: 1;
+    cursor: pointer; padding: 0 4px; font-family: inherit;
+}
+.bandeau-succes button:hover { color: #D4AF37; }
+@keyframes bandeauEntree { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+
 /* Étoile rouge des champs obligatoires */
 .etoile { color: #d9534f; font-weight: 700; margin-left: 3px; }
 
@@ -536,7 +552,7 @@ button.envoi, input[type="submit"].envoi { opacity: .65; cursor: progress; }
 
 /* ===== IMPRESSION : on ne garde que le contenu ===== */
 @media print {
-    .header, .sidebar, .footer, .fond-sidebar-mobile, .succes-fond, .lien-evitement { display: none !important; }
+    .header, .sidebar, .footer, .fond-sidebar-mobile, .succes-fond, .bandeau-succes, .lien-evitement { display: none !important; }
     .container { padding: 0; }
     .main { margin: 0; padding: 0; animation: none; }
     body { background: #fff; }
@@ -736,6 +752,9 @@ button.envoi, input[type="submit"].envoi { opacity: .65; cursor: progress; }
         </div>
 
         <main class="main" id="contenu" tabindex="-1">
+            {{-- Ajouts et modifications : bandeau vert en haut de la page --}}
+            @include('partials.bandeau-succes')
+
             @yield('content')
         </main>
 
@@ -828,7 +847,8 @@ window.addEventListener('pageshow', function (e) {
 });
 </script>
 
-@if (session('success'))
+{{-- Fenêtre « Opération réussie » : uniquement pour les messages qui ne sont ni un ajout ni une modification --}}
+@if (session('success') && ! \App\Support\Notif::estBandeau(session('success')))
     <div class="succes-fond" id="succesFond" role="alertdialog" aria-modal="true" aria-live="polite">
         <div class="succes-boite">
             <div class="succes-icone">

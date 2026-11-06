@@ -105,6 +105,16 @@
     /* ===== Liste d'actions (menu déroulant) ===== */
     .actions-dropdown { display: inline-block; }
 
+    .btn-export {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: white; color: #1A8969;
+        border: 1.3px solid #1A8969; border-radius: 20px;
+        padding: 7px 16px; font-size: 12.5px; font-weight: 700; font-family: inherit;
+        cursor: pointer; transition: 0.2s ease; white-space: nowrap;
+    }
+    .btn-export .svg { width: 15px; height: 15px; }
+    .btn-export:hover { background: #1A8969; color: white; }
+
     .btn-actions .svg { width: 13px; height: 13px; }
     .btn-actions {
         display: inline-flex;
@@ -308,7 +318,7 @@
     <form class="controles" method="GET" action="{{ route('reservations.mes_demandes') }}" onsubmit="return false;">
         <div class="champ-recherche">
             <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <input type="text" id="rechercheLigne" placeholder="Rechercher une demande...">
+            <input type="text" id="rechercheLigne" placeholder="Rechercher une demande">
         </div>
         <select name="statut" onchange="window.location = '{{ route('reservations.mes_demandes') }}' + (this.value === 'toutes' ? '' : '?statut=' + this.value)">
             <option value="toutes" @selected($statut == 'toutes')>Tous les statuts</option>
@@ -318,6 +328,7 @@
             <option value="annulee" @selected($statut == 'annulee')>Annulées</option>
         </select>
     </form>
+
     <div class="compteur-resultats"><strong id="nbResultats">{{ $demandes->count() }}</strong> demande(s)</div>
 </div>
 
