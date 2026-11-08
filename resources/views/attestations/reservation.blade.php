@@ -4,167 +4,177 @@
     <meta charset="UTF-8">
     <title>Attestation {{ $r->reference }}</title>
     <style>
-        @page { margin: 34px 44px 64px 44px; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #222; line-height: 1.4; }
+        @page { margin: 34px 50px 70px 50px; }
+        body { font-family: 'Helvetica', 'DejaVu Sans', sans-serif; font-size: 12.5px; color: #111; line-height: 1.65; }
 
-        /* En-tête */
-        .entete { width: 100%; border-collapse: collapse; }
-        .entete td { vertical-align: middle; }
-        .entete .logo { width: 80px; }
-        .entete .logo img { width: 64px; }
-        .entete .org { text-align: center; }
-        .entete .org .nom { font-size: 13px; font-weight: bold; color: #1A8969; text-transform: uppercase; letter-spacing: 0.5px; }
-        .entete .org .pays { font-size: 10px; color: #666; margin-top: 3px; }
-        .entete .org .devise { font-size: 9px; color: #888; font-style: italic; margin-top: 1px; }
-        .filet { height: 3px; background: #D4AF37; margin: 10px 0 24px; }
+        /* ===== Filigrane (logo très pâle au centre) ===== */
+        .filigrane { position: fixed; top: 270px; left: 175px; width: 330px; opacity: 0.07; }
 
-        /* Titre */
-        h1 { font-size: 16px; color: #1A8969; text-align: center; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.4px; }
-        .reference { text-align: center; margin-bottom: 24px; }
-        .reference span { display: inline-block; border: 1px solid #1A8969; color: #1A8969; font-weight: bold; font-size: 11.5px; padding: 4px 16px; }
+        /* ===== Cartouche vert (collé au coin haut droit) ===== */
+        .cachet { position: fixed; top: -34px; right: -50px; width: 215px; background: #1A8969; color: #fff;
+                  padding: 9px 11px; font-size: 9px; line-height: 1.5; }
+        .cachet b { color: #FFE680; }
 
-        /* Sections */
-        .section { font-size: 11.5px; font-weight: bold; color: #1A8969; text-transform: uppercase; letter-spacing: 0.3px;
-                   border-bottom: 1px solid #1A8969; padding-bottom: 3px; margin: 18px 0 8px; }
+        /* ===== En-tête ===== */
+        table.entete { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        table.entete td { vertical-align: top; }
+        .logo-cell { width: 120px; }
+        .logo-cell img { width: 95px; }
+        .org { text-align: center; padding-right: 215px; padding-left: 0; }
+        .org .pays { font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .org .devise { font-size: 9.5px; font-style: italic; }
+        .org .tiret { font-size: 8px; letter-spacing: 1px; line-height: 1.2; }
+        .org .dgi { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 3px; }
 
-        table.infos { width: 100%; border-collapse: collapse; }
-        table.infos td { border: 1px solid #d5ddd9; padding: 6px 9px; font-size: 10.5px; vertical-align: top; }
-        table.infos td.lib { background: #eef4f1; font-size: 9px; font-weight: bold; color: #444; text-transform: uppercase; letter-spacing: 0.3px; width: 19%; }
-        table.infos td.val { width: 31%; }
+        /* ===== Titre ===== */
+        .titre-wrap { margin: 52px 0 38px; text-align: center; }
+        .titre { display: inline-block; border: 2px solid #111; border-radius: 12px;
+                 padding: 14px 40px; font-size: 20px; font-weight: bold; text-transform: uppercase; background: #fff; }
 
-        .statut { display: inline-block; background: #d4edda; color: #155724; font-weight: bold; font-size: 10px; padding: 2px 10px; }
+        /* ===== Corps ===== */
+        .corps { padding: 0 6px; }
+        .corps p { margin: 0 0 10px; }
+        table.champs { border-collapse: collapse; margin: 2px 0 10px; width: 100%; }
+        table.champs td { padding: 1px 0; vertical-align: top; }
+        table.champs td.lib { width: 150px; }
+        table.champs td.sep { width: 14px; }
+        .fort { font-weight: bold; }
 
-        /* Texte d'attestation */
-        .texte { margin-top: 22px; padding: 12px 14px; border-left: 4px solid #D4AF37; background: #fafaf5;
-                 font-size: 11px; line-height: 1.7; color: #333; text-align: justify; }
+        /* ===== Signature ===== */
+        .signature { margin-top: 20px; text-align: right; padding-right: 10px; }
+        .signature .qui { margin-bottom: 40px; }
+        .signature .nom { font-weight: bold; font-size: 11px; }
+        .signature .role { font-style: italic; font-size: 10px; color: #333; }
 
-        /* Signatures */
-        table.signatures { width: 100%; border-collapse: collapse; margin-top: 30px; page-break-inside: avoid; }
-        table.signatures td { width: 50%; text-align: center; vertical-align: top; font-size: 10.5px; font-weight: bold; padding: 0 24px; }
-        table.signatures .espace { height: 58px; border-bottom: 1px solid #555; }
-        table.signatures .nom { margin-top: 6px; font-size: 10px; font-weight: normal; color: #444; }
+        /* ===== Ampliations ===== */
+        .ampl { margin-top: 26px; font-size: 12px; line-height: 1.5; }
+        .ampl .t { font-weight: bold; text-decoration: underline; }
+        .ampl ul { margin: 2px 0 0; padding-left: 16px; list-style: none; }
 
-        /* Pied de page */
-        .pied { position: fixed; left: 0; right: 0; bottom: -40px; border-top: 1px solid #d5ddd9; padding-top: 6px;
-                text-align: center; font-size: 8.5px; color: #888; }
+        /* ===== QR code ===== */
+        .qr { position: fixed; right: 0; bottom: 62px; width: 78px; }
+        .qr img { width: 78px; }
+
+        /* ===== Bandeau de sécurité ===== */
+        .secu { position: fixed; left: 0; right: 0; bottom: -28px; border: 1px solid #1A8969; }
+        .secu .h { background: #1A8969; color: #fff; font-weight: bold; font-size: 9.5px; padding: 2px 7px; }
+        .secu .b { padding: 4px 7px; font-size: 9px; line-height: 1.4; }
+        .secu .code { color: #d40000; font-weight: bold; font-size: 11px; }
+
+        /* ===== Étiquette en bas à droite ===== */
+        .tag { position: fixed; right: 0; bottom: -52px; background: #000; color: #fff; font-size: 8.5px;
+               font-weight: bold; padding: 1px 5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
+    @php
+        $logoData = $logo ?? null;
+    @endphp
+    {{-- Filigrane --}}
+    @if ($logoData)
+<img class="filigrane" src="{{ $logoData }}" alt="">
+    @endif
+
+    {{-- Cartouche vert --}}
+    <div class="cachet">
+        Attestation générée par la plateforme<br>
+        de gestion des salles de la Direction Générale des Impôts<br>
+        <b>Délivrée le</b> {{ $genereLe }}<br>
+        <b>N° de référence :</b> {{ $r->reference }}
+    </div>
+
+    {{-- En-tête --}}
     <table class="entete">
         <tr>
-            <td class="logo">
-                @if ($logo)
-                    <img src="{{ $logo }}" alt="Logo">
+            <td class="logo-cell">
+                @if ($logoData)
+                    <img src="{{ $logoData }}" alt="Logo">
                 @endif
             </td>
             <td class="org">
-                <div class="nom">Direction Générale des Impôts</div>
                 <div class="pays">Burkina Faso</div>
-                <div class="devise">Unité - Progrès - Justice</div>
+                <div class="devise">La Patrie ou la Mort, nous Vaincrons</div>
+                <div class="tiret">- - - - - - - - - -</div>
+                <div class="dgi">Direction Générale des Impôts</div>
+                <div class="tiret">- - - - - - - - - -</div>
             </td>
-            <td class="logo"></td>
-        </tr>
-    </table>
-    <div class="filet"></div>
-
-    <h1>Attestation de réservation de salle</h1>
-    <div class="reference"><span>Référence : {{ $r->reference }}</span></div>
-
-    <div class="section">Demandeur</div>
-    <table class="infos">
-        <tr>
-            <td class="lib">Nom et prénom</td>
-            <td class="val" colspan="3">{{ $demandeur->name ?? 'Utilisateur supprimé' }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Direction</td>
-            <td class="val">{{ $direction ?: '-' }}</td>
-            <td class="lib">Service</td>
-            <td class="val">{{ $service ?: '-' }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Courriel</td>
-            <td class="val" colspan="3">{{ $r->email ?? ($demandeur->email ?? '-') }}</td>
         </tr>
     </table>
 
-    <div class="section">Salle réservée</div>
-    <table class="infos">
-        <tr>
-            <td class="lib">Salle</td>
-            <td class="val" colspan="3">{{ $salle->nom ?? 'Salle supprimée' }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Localité</td>
-            <td class="val">{{ $salle->localite ?? '-' }}</td>
-            <td class="lib">Capacité</td>
-            <td class="val">{{ isset($salle->capacite) ? $salle->capacite . ' places' : '-' }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Direction de la salle</td>
-            <td class="val" colspan="3">{{ $salle->direction->nom_direction ?? '-' }}</td>
-        </tr>
-    </table>
-
-    <div class="section">Détails de la réservation</div>
-    <table class="infos">
-        <tr>
-            <td class="lib">Motif</td>
-            <td class="val">{{ $r->motif }}</td>
-            <td class="lib">Participants</td>
-            <td class="val">{{ $r->nombre ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Période</td>
-            <td class="val">{{ $periode }}</td>
-            <td class="lib">Horaire</td>
-            <td class="val">{{ $horaire }}</td>
-        </tr>
-        <tr>
-            <td class="lib">Demande déposée le</td>
-            <td class="val">{{ $r->created_at->format('d/m/Y à H:i') }}</td>
-            <td class="lib">Statut</td>
-            <td class="val"><span class="statut">Confirmée</span></td>
-        </tr>
-    </table>
-
-    <div class="section">Validation</div>
-    <table class="infos">
-        <tr>
-            <td class="lib">Validée par</td>
-            <td class="val">{{ $valideur->name ?? 'Non renseigné' }}@if ($roleValideur) ({{ $roleValideur }})@endif</td>
-            <td class="lib">Date de validation</td>
-            <td class="val">{{ $dateValidation }}</td>
-        </tr>
-    </table>
-
-    <div class="texte">
-        La Direction Générale des Impôts atteste que la demande de réservation référencée
-        <strong>{{ $r->reference }}</strong> a été examinée et <strong>validée</strong>.
-        La salle <strong>{{ $salle->nom ?? '-' }}</strong> est réservée à
-        <strong>{{ $demandeur->name ?? 'le demandeur' }}</strong> pour la période et l'horaire indiqués
-        ci-dessus. Cette attestation peut être présentée sur demande.
+    {{-- Titre --}}
+    <div class="titre-wrap">
+        <div class="titre">Attestation de réservation de salle</div>
     </div>
 
-    <table class="signatures">
-        <tr>
-            <td>
-                <div>Le demandeur</div>
-                <div class="espace"></div>
-                <div class="nom">{{ $demandeur->name ?? '' }}</div>
-            </td>
-            <td>
-                <div>Le valideur</div>
-                <div class="espace"></div>
-                <div class="nom">{{ $valideur->name ?? '' }}</div>
-            </td>
-        </tr>
-    </table>
+    {{-- Corps --}}
+    <div class="corps">
+        <p>
+            Je soussigné, <span class="fort">{{ $valideur->name ?? 'le valideur' }}</span>@if ($roleValideur), {{ $roleValideur }}@endif,
+            certifie que :
+        </p>
 
-    <div class="pied">
-        Document généré le {{ $genereLe }} par la plateforme de gestion des salles de la DGI &middot; {{ $r->reference }}
+        <table class="champs">
+            <tr><td class="lib">Demandeur</td><td class="sep">:</td><td class="fort">{{ $demandeur->name ?? 'Utilisateur supprimé' }}</td></tr>
+            <tr><td class="lib">Direction</td><td class="sep">:</td><td>{{ $direction ?: '-' }}</td></tr>
+            <tr><td class="lib">Service</td><td class="sep">:</td><td>{{ $service ?: '-' }}</td></tr>
+            <tr><td class="lib">Courriel</td><td class="sep">:</td><td>{{ $r->email ?? ($demandeur->email ?? '-') }}</td></tr>
+        </table>
+
+        <p>
+            Bénéficiaire de la demande de réservation N° <span class="fort">{{ $r->reference }}</span>,
+            déposée le {{ $r->created_at->format('d/m/Y') }} et validée le {{ $dateValidation }},
+            pour le motif suivant : <span class="fort">{{ $r->motif }}</span>.
+        </p>
+
+        <p>
+            Est autorisé à utiliser la salle <span class="fort">{{ $salle->nom ?? 'Salle supprimée' }}</span>
+            @if (!empty($salle->localite)) ({{ $salle->localite }}@if (isset($salle->capacite)), {{ $salle->capacite }} places @endif)@endif,
+            <span class="fort">{{ $periode }}</span>, de <span class="fort">{{ $horaire }}</span>
+            @if (!empty($r->nombre)), pour {{ $r->nombre }} participant(s)@endif.
+        </p>
+
+        <p style="margin-top: 16px;">
+            En foi de quoi, la présente attestation est établie pour servir et valoir ce que de droit.
+        </p>
     </div>
+
+    {{-- Signature --}}
+    <div class="signature">
+        <div class="qui">Le valideur</div>
+        <div class="nom">{{ $valideur->name ?? '' }}</div>
+        @if ($roleValideur)
+            <div class="role">{{ $roleValideur }}</div>
+        @endif
+    </div>
+
+    {{-- Ampliations --}}
+    <div class="ampl">
+        <div class="t">Ampliations :</div>
+        <ul>
+            <li>- Demandeur : 1</li>
+            <li>- Gestionnaire de la salle : 1</li>
+            <li>- Archives : 1</li>
+        </ul>
+    </div>
+
+    {{-- QR code (facultatif : affiché seulement si $qr est fourni) --}}
+    @if (!empty($qr))
+        <div class="qr"><img src="{{ $qr }}" alt="QR"></div>
+    @endif
+
+    {{-- Bandeau de sécurité --}}
+    <div class="secu">
+        <div class="h">CODE DE SÉCURITÉ</div>
+        <div class="b">
+            Cette attestation de réservation est authentifiable avec le code de sécurité suivant :
+            <span class="code">{{ $r->reference }}</span><br>
+            Pour vérifier l'authenticité et la validité de ce document, veuillez vous rapprocher du gestionnaire de la salle
+            ou consulter la <b>plateforme de gestion des salles</b> de la DGI.
+        </div>
+    </div>
+
+    <div class="tag">Attestation de réservation</div>
 
 </body>
 </html>

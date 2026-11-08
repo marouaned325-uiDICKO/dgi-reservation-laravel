@@ -221,7 +221,7 @@
 
     /* ===== CARTE CLIQUABLE + OCCUPATION ===== */
     .salle-card { cursor: pointer; }
-    .salle-localite-ligne { justify-content: space-between; flex-wrap: wrap; gap: 6px 8px; }
+    .salle-localite-ligne { flex-direction: column; align-items: flex-start; gap: 6px; }
     .salle-localite-ligne .ville { display: inline-flex; align-items: center; gap: 6px; }
     .occupation {
         display: inline-block; font-size: 11px; font-weight: 700; line-height: 1.3;
@@ -300,13 +300,21 @@
                     <div>
                         <div class="salle-localite-ligne">
                             <span class="ville"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> {{ $salle->localite ?? '-' }}</span>
-                            @if ($enCours)
+                            @if ($periodes->isNotEmpty())
+                                @php $prochaine = $enCours ?? $periodes->first(); @endphp
                                 <span class="occupation">
                                     Occupée
-                                    @if ($enCours->heure_fin)
-                                        jusqu'à {{ substr($enCours->heure_fin, 0, 5) }}
+                                    @if ($enCours)
+                                        @if ($enCours->heure_fin)
+                                            jusqu'à {{ substr($enCours->heure_fin, 0, 5) }}
+                                        @else
+                                            jusqu'au {{ \Carbon\Carbon::parse($enCours->date_fin ?? $enCours->date_reserv)->format('d/m/Y') }}
+                                        @endif
                                     @else
-                                        jusqu'au {{ \Carbon\Carbon::parse($enCours->date_fin ?? $enCours->date_reserv)->format('d/m/Y') }}
+                                        le {{ \Carbon\Carbon::parse($prochaine->date_reserv)->format('d/m') }}
+                                        @if ($prochaine->heure_debut)
+                                            à {{ substr($prochaine->heure_debut, 0, 5) }}
+                                        @endif
                                     @endif
                                 </span>
                             @else

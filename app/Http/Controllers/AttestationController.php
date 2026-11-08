@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
+use Endroid\QrCode\Builder\Builder;
 
 class AttestationController extends Controller
 {
@@ -56,7 +57,18 @@ class AttestationController extends Controller
                 : ($valideur->role === 'gestionnaire' ? 'Gestionnaire' : ucfirst((string) $valideur->role)))
             : '';
 
-        $logo = public_path('images/logo-dgi.png');
+        // Logo intégré dans le PDF (image encodée) : plus de souci de chemin
+        $logoPath = public_path('images/logo_dgi.jpeg');
+        $logo = is_file($logoPath)
+    ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath))
+    : null;
+
+        // QR code (créé AVANT la vue)
+        $qr = (new Builder(
+            data: url('/verification/' . $reservation->reference),
+            size: 200,
+            margin: 4,
+        ))->build()->getDataUri();
 
         $html = view('attestations.reservation', [
             'r'            => $reservation,
@@ -71,7 +83,8 @@ class AttestationController extends Controller
             'dateValidation' => $reservation->traite_le
                 ? Carbon::parse($reservation->traite_le)->format('d/m/Y à H:i')
                 : '-',
-            'logo'         => file_exists($logo) ? $logo : null,
+            'logo'         => $logo,
+            'qr'           => $qr,
             'genereLe'     => now()->format('d/m/Y à H:i'),
         ])->render();
 
