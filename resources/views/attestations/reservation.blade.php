@@ -141,22 +141,13 @@
 
     {{-- Signature --}}
     <div class="signature">
-        <div class="qui">Le valideur</div>
+        <div class="qui">Gestionnaire de la salle</div>
         <div class="nom">{{ $valideur->name ?? '' }}</div>
         @if ($roleValideur)
             <div class="role">{{ $roleValideur }}</div>
         @endif
     </div>
 
-    {{-- Ampliations --}}
-    <div class="ampl">
-        <div class="t">Ampliations :</div>
-        <ul>
-            <li>- Demandeur : 1</li>
-            <li>- Gestionnaire de la salle : 1</li>
-            <li>- Archives : 1</li>
-        </ul>
-    </div>
 
     {{-- QR code (facultatif : affiché seulement si $qr est fourni) --}}
     @if (!empty($qr))
@@ -170,7 +161,7 @@
             Cette attestation de réservation est authentifiable avec le code de sécurité suivant :
             <span class="code">{{ $r->reference }}</span><br>
             Pour vérifier l'authenticité et la validité de ce document, veuillez vous rapprocher du gestionnaire de la salle
-            ou consulter la <b>plateforme de gestion des salles</b> de la DGI.
+            ou consulter la <b> plateforme de gestion des salles</b> de la DGI.
         </div>
     </div>
 
