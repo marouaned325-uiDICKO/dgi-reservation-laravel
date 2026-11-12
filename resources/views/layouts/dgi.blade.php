@@ -672,7 +672,7 @@ button.envoi, input[type="submit"].envoi { opacity: .65; cursor: progress; }
 
                 @endif
 
-                @if(in_array(auth()->user()->role, ['agent', 'gestionnaire', 'admin']))
+                @if(auth()->user()->role === 'agent')
 
                     <a href="{{ route('reservations.mes_demandes') }}"
                        class="{{ request()->routeIs('reservations.mes_demandes') ? 'active' : '' }}">

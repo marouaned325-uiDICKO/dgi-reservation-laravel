@@ -61,7 +61,7 @@
     }
     .alerte-direction a { color: #7a5d05; text-decoration: underline; }
 
-    .liens-rapides { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .liens-rapides { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .lien-rapide {
         background: white; border-radius: 12px; padding: 18px; text-decoration: none; color: #222;
         display: flex; align-items: center; gap: 14px; border: 1px solid #eef1ef;
@@ -228,6 +228,14 @@
     <a href="{{ route('admin.salles.index') }}" class="lien-rapide">
         <span class="pastille-icone"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 20v-6h6v6"/><path d="M7 8h2M11 8h2M15 8h2"/></svg></span>
         <div><div class="titre">Salles</div><div class="sous-titre">Gestion et disponibilité</div></div>
+    </a>
+    <a href="{{ route('salles.liste') }}" class="lien-rapide">
+        <span class="pastille-icone"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M12 14v4M10 16h4"/></svg></span>
+        <div><div class="titre">Réserver une salle</div><div class="sous-titre">Consulter et réserver</div></div>
+    </a>
+    <a href="{{ route('reservations.mes_demandes') }}" class="lien-rapide">
+        <span class="pastille-icone"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+        <div><div class="titre">Mes demandes</div><div class="sous-titre">Suivre mes réservations</div></div>
     </a>
 </div>
 
