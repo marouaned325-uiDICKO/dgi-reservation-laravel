@@ -663,20 +663,23 @@ button.envoi, input[type="submit"].envoi { opacity: .65; cursor: progress; }
 
                 @endif
 
-                @if(in_array(auth()->user()->role, ['agent', 'gestionnaire', 'admin']))
+                @if(auth()->user()->role === 'agent')
 
                     <a href="{{ route('salles.liste') }}"
                        class="{{ request()->routeIs('salles.liste', 'reservations.create', 'reservations.edit') ? 'active' : '' }}">
                         <span class="ic"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 20v-6h6v6"/><path d="M7 8h2M11 8h2M15 8h2"/></svg></span> Salles
                     </a>
 
+                @endif
+
+                @if(in_array(auth()->user()->role, ['agent', 'gestionnaire', 'admin']))
+
                     <a href="{{ route('reservations.mes_demandes') }}"
                        class="{{ request()->routeIs('reservations.mes_demandes') ? 'active' : '' }}">
-                        <span class="ic"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span> Mes demandes
+                        <span class="ic"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span> Mes demandes
                     </a>
 
                 @endif
-
                 @if(in_array(auth()->user()->role, ['gestionnaire', 'admin']))
 
                     <a href="{{ route('validation.index') }}"
