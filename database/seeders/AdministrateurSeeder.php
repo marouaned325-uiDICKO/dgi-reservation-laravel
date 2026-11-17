@@ -10,18 +10,13 @@ class AdministrateurSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = config('dgi.admin.email');
-        $password = config('dgi.admin.password');
-
-        if (! $email || ! $password) {
-            $this->command?->error('ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans le .env');
-            return;
-        }
+        $email = 'admin@dgi.bf';
+        $password = 'Admin@2026';
 
         $admin = User::firstOrNew(['email' => $email]);
 
         $admin->forceFill([
-            'name'                      => config('dgi.admin.name'),
+            'name'                      => 'Administrateur Système',
             'role'                      => 'admin',
             'est_principal'             => false,
             'direction_id'              => null,
