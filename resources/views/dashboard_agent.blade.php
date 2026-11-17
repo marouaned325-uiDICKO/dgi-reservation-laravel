@@ -3,6 +3,38 @@
 @section('title', 'Tableau de bord - DGI')
 
 @section('content')
+@php
+    $etats = [
+        'en_attente' => 'En attente',
+        'confirmee'  => 'Confirmée',
+        'refusee'    => 'Refusée',
+        'annulee'    => 'Annulée',
+    ];
+
+    $aujourdhui = \Carbon\Carbon::today();
+    $heure = (int) now()->format('H');
+    $salutation = $heure >= 18 ? 'Bonsoir' : 'Bonjour';
+
+    $totalDemandes = $stats['en_cours'] + $stats['validees'] + $stats['rejetees'];
+    $base = max(1, $totalDemandes);
+    $pctAttente = round($stats['en_cours'] / $base * 100);
+    $pctValidees = round($stats['validees'] / $base * 100);
+    $pctRejetees = $totalDemandes > 0 ? max(0, 100 - $pctAttente - $pctValidees) : 0;
+
+    // Prochaine réservation confirmée (à venir ou en cours), parmi les dernières demandes
+    $prochaine = $dernieresDemandes
+        ->filter(function ($r) use ($aujourdhui) {
+            if ($r->statut !== 'confirmee') return false;
+            $fin = $r->date_fin ? \Carbon\Carbon::parse($r->date_fin) : \Carbon\Carbon::parse($r->date_reserv);
+            return $fin->gte($aujourdhui);
+        })
+        ->sortBy('date_reserv')
+        ->first();
+
+    $direction = auth()->user()->direction->nom_direction ?? null;
+    $service = auth()->user()->service->nom_service ?? null;
+@endphp
+
 <style>
     .svg { width: 20px; height: 20px; flex-shrink: 0; }
 
@@ -20,6 +52,12 @@
     .banner .texte, .banner .droite { position: relative; z-index: 1; }
     .banner .texte h2 { font-size: 21px; margin-bottom: 6px; font-weight: 700; }
     .banner .texte p { color: #d9f0e3; font-size: 14px; }
+    .banner .direction-ligne {
+        display: inline-flex; align-items: center; gap: 8px; margin-top: 10px;
+        background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
+        padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 700; color: white;
+    }
+    .banner .direction-ligne .svg { width: 15px; height: 15px; }
     .banner .droite { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .banner .date-badge {
         background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
@@ -55,6 +93,32 @@
     .btn-voir-tout .svg { width: 14px; height: 14px; }
     .btn-voir-tout:hover { background: #1A8969; color: white; }
 
+    /* ===== PROCHAINE RÉSERVATION ===== */
+    .prochaine {
+        display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+        background: linear-gradient(135deg, #ffffff 0%, #f3faf6 100%);
+        border: 1px solid #cfe5dc; border-left: 5px solid #1A8969; border-radius: 14px;
+        padding: 18px 22px; margin-bottom: 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05), 0 16px 20px -16px rgba(212, 175, 55, 0.45);
+    }
+    .prochaine-icone {
+        width: 52px; height: 52px; border-radius: 14px; background: #1A8969; color: white;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .prochaine-icone .svg { width: 26px; height: 26px; }
+    .prochaine-corps { flex: 1; min-width: 200px; }
+    .prochaine-etiquette { font-size: 11px; font-weight: 700; color: #1A8969; text-transform: uppercase; letter-spacing: 0.7px; }
+    .prochaine-salle { font-size: 17px; font-weight: 800; color: #1a1a1a; margin-top: 2px; }
+    .prochaine-infos { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; font-size: 13px; color: #555; }
+    .prochaine-infos span { display: inline-flex; align-items: center; gap: 6px; }
+    .prochaine-infos .svg { width: 15px; height: 15px; color: #8a9a92; }
+    .prochaine-delai {
+        background: #1A8969; color: white; font-size: 12.5px; font-weight: 800;
+        padding: 8px 16px; border-radius: 20px; white-space: nowrap;
+    }
+    .prochaine-delai.aujourdhui { background: #D4AF37; color: #3d2f00; }
+
+    /* ===== STATISTIQUES ===== */
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
     .stat-card {
         background: white; border-radius: 12px; padding: 16px 18px;
@@ -73,6 +137,18 @@
     .stat-card .number { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.1; }
     .stat-card .label { font-size: 12px; color: #777; margin-top: 3px; }
 
+    /* ===== RÉPARTITION ===== */
+    .carte-blanche { background: white; border-radius: 12px; border: 1px solid #eef1ef; padding: 18px 22px; margin-top: 15px; }
+    .barre-repartition { display: flex; height: 12px; border-radius: 8px; overflow: hidden; background: #eef1ef; }
+    .barre-repartition span { display: block; height: 100%; }
+    .seg-attente { background: #D4AF37; }
+    .seg-validee { background: #1A8969; }
+    .seg-refusee { background: #d9534f; }
+    .legende { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-size: 12.5px; color: #666; }
+    .legende span { display: inline-flex; align-items: center; gap: 7px; }
+    .legende i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    /* ===== DEMANDES ===== */
     .demandes-grille { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .demande {
         background: white; border-radius: 12px; padding: 16px 18px;
@@ -85,6 +161,7 @@
     .demande.en_attente { border-left-color: #D4AF37; }
     .demande.refusee    { border-left-color: #d9534f; }
     .demande.annulee    { border-left-color: #999; }
+    .demande.terminee   { opacity: .78; }
 
     .demande-entete { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
     .demande-icone {
@@ -98,6 +175,14 @@
     .demande-titre { font-size: 14px; font-weight: 700; color: #1a1a1a; word-break: break-word; }
     .demande-ref { font-size: 11.5px; color: #999; margin-bottom: 12px; letter-spacing: 0.3px; }
 
+    .delai {
+        display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px;
+        border-radius: 10px; margin-left: 8px; vertical-align: middle;
+    }
+    .delai-proche  { background: #fff6dd; color: #b8860b; border: 1px solid #ecd9a0; }
+    .delai-venir   { background: #e8f5e9; color: #1A8969; border: 1px solid #cfe5dc; }
+    .delai-termine { background: #eef1ef; color: #5b6b63; border: 1px solid #d9e0dc; }
+
     .demande-infos { display: flex; flex-direction: column; gap: 7px; }
     .demande-info { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #555; word-break: break-word; }
     .demande-info .svg { width: 15px; height: 15px; color: #8a9a92; margin-top: 1px; }
@@ -109,7 +194,7 @@
     .demande-bas {
         display: flex; justify-content: space-between; align-items: center;
         margin-top: auto; padding-top: 12px; border-top: 1px solid #f0f0f0;
-        flex-wrap: wrap; gap: 6px;
+        flex-wrap: wrap; gap: 8px;
     }
     .demande-infos + .demande-bas, .demande-refus + .demande-bas { margin-top: 14px; }
     .badge {
@@ -122,6 +207,15 @@
     .badge-refusee    { background: #fdeaea; color: #c0392b; }
     .badge-annulee    { background: #eee; color: #666; }
     .demande-depose { font-size: 11.5px; color: #999; }
+
+    .btn-attestation {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; font-weight: 700; color: #1A8969; text-decoration: none;
+        padding: 5px 12px; border: 1.3px solid #1A8969; border-radius: 20px;
+        transition: 0.2s ease; white-space: nowrap;
+    }
+    .btn-attestation .svg { width: 13px; height: 13px; }
+    .btn-attestation:hover { background: #1A8969; color: white; }
 
     .vide {
         background: white; border-radius: 12px; padding: 44px 20px;
@@ -151,22 +245,28 @@
         .stat-card { padding: 14px; }
         .stat-card .number { font-size: 19px; }
         .demande { padding: 14px; }
+        .prochaine { padding: 14px 16px; }
+        .prochaine-delai { align-self: flex-start; }
+        .carte-blanche { padding: 16px; }
     }
 </style>
 
-@php
-    $etats = [
-        'en_attente' => 'En attente',
-        'confirmee'  => 'Confirmée',
-        'refusee'    => 'Refusée',
-        'annulee'    => 'Annulée',
-    ];
-@endphp
-
 <div class="banner">
     <div class="texte">
-        <h2>Bonjour, {{ auth()->user()->name }}</h2>
-        <p>Suivez ici l'état de vos demandes de réservation.</p>
+        <h2>{{ $salutation }}, {{ auth()->user()->name }}</h2>
+        <p>
+            @if ($stats['en_cours'] > 0)
+                {{ $stats['en_cours'] }} demande{{ $stats['en_cours'] > 1 ? 's' : '' }} en attente de validation.
+            @else
+                Suivez ici l'état de vos demandes de réservation.
+            @endif
+        </p>
+        @if ($direction)
+            <span class="direction-ligne">
+                <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg>
+                {{ $direction }}{{ $service ? ' · ' . $service : '' }}
+            </span>
+        @endif
     </div>
     <div class="droite">
         <a href="{{ route('salles.liste') }}" class="btn-reserver">
@@ -180,11 +280,43 @@
     </div>
 </div>
 
+{{-- ===== PROCHAINE RÉSERVATION ===== --}}
+@if ($prochaine)
+    @php
+        $pDebut = \Carbon\Carbon::parse($prochaine->date_reserv);
+        $pFin = $prochaine->date_fin ? \Carbon\Carbon::parse($prochaine->date_fin) : $pDebut;
+        $pPeriode = $pDebut->isSameDay($pFin)
+            ? $pDebut->translatedFormat('l d F Y')
+            : $pDebut->format('d/m/Y') . ' au ' . $pFin->format('d/m/Y');
+        $pHoraire = ($prochaine->heure_debut && $prochaine->heure_fin)
+            ? substr($prochaine->heure_debut, 0, 5) . ' - ' . substr($prochaine->heure_fin, 0, 5)
+            : 'Journée entière';
+        $pJours = (int) $aujourdhui->diffInDays($pDebut, false);
+        $pEnCours = $pDebut->lte($aujourdhui);
+        $pDelai = $pEnCours ? "En cours aujourd'hui" : ($pJours === 1 ? 'Demain' : 'Dans ' . $pJours . ' jours');
+    @endphp
+    <div class="prochaine" role="region" aria-label="Prochaine réservation">
+        <div class="prochaine-icone">
+            <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/><path d="M9 16l2 2 4-4"/></svg>
+        </div>
+        <div class="prochaine-corps">
+            <div class="prochaine-etiquette">Prochaine réservation</div>
+            <div class="prochaine-salle">{{ $prochaine->salle->nom ?? 'Salle supprimée' }}</div>
+            <div class="prochaine-infos">
+                <span><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg> {{ ucfirst($pPeriode) }}</span>
+                <span><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> {{ $pHoraire }}</span>
+                <span><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> {{ $prochaine->salle->localite ?? '-' }}</span>
+            </div>
+        </div>
+        <div class="prochaine-delai {{ $pEnCours ? 'aujourdhui' : '' }}">{{ $pDelai }}</div>
+    </div>
+@endif
+
 <div class="stats">
     <div class="stat-card">
         <div class="stat-icone ton-gris"><svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
         <div>
-            <div class="number">{{ $stats['en_cours'] + $stats['validees'] + $stats['rejetees'] }}</div>
+            <div class="number">{{ $totalDemandes }}</div>
             <div class="label">Total des demandes</div>
         </div>
     </div>
@@ -211,6 +343,22 @@
     </div>
 </div>
 
+@if ($totalDemandes > 0)
+    <div class="carte-blanche">
+        <div class="barre-repartition" role="img"
+             aria-label="Répartition de vos demandes : {{ $stats['en_cours'] }} en attente, {{ $stats['validees'] }} confirmées, {{ $stats['rejetees'] }} refusées">
+            <span class="seg-attente" style="width: {{ $pctAttente }}%"></span>
+            <span class="seg-validee" style="width: {{ $pctValidees }}%"></span>
+            <span class="seg-refusee" style="width: {{ $pctRejetees }}%"></span>
+        </div>
+        <div class="legende">
+            <span><i class="seg-attente"></i> En attente ({{ $stats['en_cours'] }})</span>
+            <span><i class="seg-validee"></i> Confirmées ({{ $stats['validees'] }})</span>
+            <span><i class="seg-refusee"></i> Refusées ({{ $stats['rejetees'] }})</span>
+        </div>
+    </div>
+@endif
+
 <div class="section-titre">
     <span class="texte-titre">Mes dernières demandes</span>
     <a href="{{ route('reservations.mes_demandes') }}" class="btn-voir-tout">Voir mes demandes <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -229,8 +377,24 @@
         $periode = $debut->isSameDay($fin)
             ? $debut->format('d/m/Y')
             : $debut->format('d/m/Y') . ' au ' . $fin->format('d/m/Y');
+
+        // Étiquette de délai (réservations confirmées seulement)
+        $delaiTexte = null;
+        $delaiClasse = '';
+        $terminee = false;
+        if ($statut === 'confirmee') {
+            if ($fin->lt($aujourdhui)) {
+                $delaiTexte = 'Terminée'; $delaiClasse = 'delai-termine'; $terminee = true;
+            } elseif ($debut->lte($aujourdhui)) {
+                $delaiTexte = "Aujourd'hui"; $delaiClasse = 'delai-proche';
+            } else {
+                $jours = (int) $aujourdhui->diffInDays($debut, false);
+                $delaiTexte = $jours === 1 ? 'Demain' : 'Dans ' . $jours . ' jours';
+                $delaiClasse = $jours <= 2 ? 'delai-proche' : 'delai-venir';
+            }
+        }
     @endphp
-    <div class="demande {{ $statut }}">
+    <div class="demande {{ $statut }} {{ $terminee ? 'terminee' : '' }}">
         <div class="demande-entete">
             <div class="demande-icone">
                 @if ($statut === 'confirmee')
@@ -243,7 +407,12 @@
                     <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                 @endif
             </div>
-            <div class="demande-titre">{{ \Illuminate\Support\Str::ucfirst(mb_strtolower($r->motif)) }}</div>
+            <div class="demande-titre">
+                {{ \Illuminate\Support\Str::ucfirst(mb_strtolower($r->motif)) }}
+                @if ($delaiTexte)
+                    <span class="delai {{ $delaiClasse }}">{{ $delaiTexte }}</span>
+                @endif
+            </div>
         </div>
         <div class="demande-ref">{{ $r->reference }}</div>
 
@@ -261,6 +430,13 @@
         <div class="demande-bas">
             <span class="demande-depose">Déposée le {{ $r->created_at->format('d/m/Y') }}</span>
             <span class="badge badge-{{ $statut }}">{{ $etats[$statut] }}</span>
+            @if ($statut === 'confirmee')
+                <a href="{{ route('reservations.attestation', $r) }}" class="btn-attestation" target="_blank" rel="noopener"
+                   aria-label="Attestation PDF de la réservation {{ $r->reference }}">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+                    Attestation PDF
+                </a>
+            @endif
         </div>
     </div>
     @empty
