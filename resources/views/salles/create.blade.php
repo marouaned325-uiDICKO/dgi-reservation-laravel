@@ -140,7 +140,7 @@
         <div class="form-group">
             <label for="photo">Photo de la salle <span class="requis">*</span></label>
             <input type="file" id="photo" name="photo" accept="image/*" required>
-            <div class="aide-photo">Image obligatoire (JPG, PNG...), 2 Mo maximum.</div>
+            <div class="aide-photo">Image obligatoire (JPG, PNG...), 10 Mo maximum.</div>
             <img id="apercuPhoto" class="apercu-photo" alt="Aperçu de la photo">
             @error('photo') <div class="error">{{ $message }}</div> @enderror
         </div>
@@ -162,8 +162,8 @@ document.getElementById('photo').addEventListener('change', function () {
         apercu.classList.remove('visible');
         return;
     }
-    if (fichier.size > 2 * 1024 * 1024) {
-        alert('La photo dépasse 2 Mo. Choisissez une image plus légère.');
+    if (fichier.size > 10 * 1024 * 1024) {
+        alert('La photo dépasse 10 Mo. Choisissez une image plus légère.');
         this.value = '';
         apercu.classList.remove('visible');
         return;
@@ -298,4 +298,5 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') msEl
 
 document.addEventListener('DOMContentLoaded', chargerCatalogue);
 </script>
+@include('users._select_recherche')
 @endsection

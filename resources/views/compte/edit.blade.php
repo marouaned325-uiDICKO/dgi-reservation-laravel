@@ -20,14 +20,36 @@
     .note-admin {
         margin-top: 18px; font-size: 12px; color: #999; font-style: italic;
     }
+
+    .message-succes {
+        background: #e8f5ef; border: 1px solid #bfe0d2; border-left: 5px solid #1A8969;
+        color: #146e54; padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
+    }
+
+    .entete-carte { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+
+    .btn-modifier, .btn-mdp {
+        display: inline-block; background: #1A8969; color: white; padding: 9px 20px;
+        border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700;
+    }
+    .btn-modifier:hover, .btn-mdp:hover { background: #146e54; }
 </style>
 
 <div class="compte">
     <h2>Mon compte</h2>
 
+    @if (session('success'))
+        <div class="message-succes">{{ session('success') }}</div>
+    @endif
+
     <div class="carte">
-        <h3>Mon profil</h3>
-        <p class="aide">Ces informations sont gérées par l'administrateur.</p>
+        <div class="entete-carte">
+            <div>
+                <h3>Mon profil</h3>
+                <p class="aide">Vous pouvez modifier votre nom, votre e-mail et votre téléphone.</p>
+            </div>
+            <a href="{{ route('mon-compte.modifier') }}" class="btn-modifier">✎ Modifier</a>
+        </div>
 
         <div class="profil">
             <span class="cle">Nom complet</span>
@@ -54,7 +76,17 @@
             <span class="valeur">{{ $utilisateur->created_at->format('d/m/Y H:i') }}</span>
         </div>
 
-        <p class="note-admin">Pour modifier vos informations personnelles, contactez un administrateur.</p>
+        <p class="note-admin">Le rôle, la direction et le service ne peuvent être modifiés que par un administrateur.</p>
+    </div>
+
+    <div class="carte">
+        <div class="entete-carte">
+            <div>
+                <h3>Mot de passe</h3>
+                <p class="aide" style="margin-bottom:0;">Changez votre mot de passe à tout moment.</p>
+            </div>
+            <a href="{{ route('mon-compte.mot-de-passe') }}" class="btn-mdp">🔒 Changer mon mot de passe</a>
+        </div>
     </div>
 </div>
 @endsection

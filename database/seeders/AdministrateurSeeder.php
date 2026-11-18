@@ -18,7 +18,7 @@ class AdministrateurSeeder extends Seeder
         $admin->forceFill([
             'name'                      => 'Administrateur Système',
             'role'                      => 'admin',
-            'est_principal'             => false,
+            'est_principal'             => true,
             'direction_id'              => null,
             'service_id'                => null,
             'doit_changer_mot_de_passe' => false,

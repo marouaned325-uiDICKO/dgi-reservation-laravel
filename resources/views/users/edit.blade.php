@@ -122,4 +122,5 @@ document.addEventListener('DOMContentLoaded', function () {
     basculerChampsAdmin();
 });
 </script>
+@include('users._select_recherche')
 @endsection

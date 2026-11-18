@@ -17,7 +17,7 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     private const LIBELLES = [
-        'admin'           => 'Admin',
+        'admin'           => 'Administrateur',
         'gestionnaire'    => 'Gestionnaire',
         'agent'           => 'Agent demandeur',
     ];

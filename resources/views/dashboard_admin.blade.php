@@ -180,6 +180,12 @@
     $pctMaintenance = max(100 - $pctDispo - $pctIndispo, 0);
     $estSysteme     = (bool) auth()->user()->est_principal;
     $rolesLibelles  = ['gestionnaire' => 'Gestionnaire', 'agent' => 'Agent'];
+
+    // Récapitulatif : 5 directions seulement (les plus actives d'abord), le reste est sur la page dédiée
+    $directionsRecap = collect($directions)
+        ->sortByDesc(fn ($d) => ($sallesParDirection[$d->id] ?? 0) * 1000 + ($attenteParDirection[$d->id] ?? 0))
+        ->take(5);
+    $utilisateursRecents = collect($derniersUtilisateurs)->take(5);
 @endphp
 
 <div class="banner">
@@ -282,7 +288,12 @@
     </div>
 </div>
 
-<div class="section-titre"><span class="texte-titre">Récapitulatif par direction</span></div>
+<div class="section-titre">
+    <span class="texte-titre">Récapitulatif par direction</span>
+    @if (count($directions) > 5)
+        <a href="{{ route('admin.recapitulatif') }}" class="btn-voir-tout">Voir plus <svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    @endif
+</div>
 <div class="table-wrapper">
     <table class="table-direction">
         <thead>
@@ -296,7 +307,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($directions as $d)
+            @forelse ($directionsRecap as $d)
                 @php
                     $nbSalles  = $sallesParDirection[$d->id] ?? 0;
                     $nbUsers   = $usersParDirection[$d->id] ?? 0;
@@ -408,7 +419,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($derniersUtilisateurs as $u)
+            @forelse ($utilisateursRecents as $u)
             @php
                 $libelleRole = $u->role === 'admin'
                     ? ($u->est_principal ? 'Admin système' : 'Admin')

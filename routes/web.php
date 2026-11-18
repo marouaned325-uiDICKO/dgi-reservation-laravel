@@ -9,6 +9,7 @@ use App\Http\Controllers\DirectionController;
 use App\Http\Controllers\EquipementController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\LocaliteController;
+use App\Http\Controllers\MonCompteController;
 use App\Http\Controllers\MotifController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageController;
@@ -50,7 +51,6 @@ Route::post('/valider/{reservation}', [ValidationController::class, 'traiter'])
     ->middleware(['auth', 'role:gestionnaire,admin'])
     ->name('validation.traiter');
 
-
 Route::middleware('auth')->group(function () {
 
     // Tableau de bord
@@ -76,6 +76,18 @@ Route::middleware('auth')->group(function () {
     // Mon compte : infos personnelles + mot de passe (tous les rôles)
     Route::get('/mon-compte', [CompteController::class, 'edit'])
         ->name('compte.edit');
+
+    Route::get('/mon-compte/modifier', [MonCompteController::class, 'edit'])
+        ->name('mon-compte.modifier');
+
+    Route::put('/mon-compte', [MonCompteController::class, 'update'])
+        ->name('mon-compte.mettre-a-jour');
+
+    Route::get('/mon-compte/mot-de-passe', [MonCompteController::class, 'motDePasse'])
+        ->name('mon-compte.mot-de-passe');
+
+    Route::put('/mon-compte/mot-de-passe', [MonCompteController::class, 'changerMotDePasse'])
+        ->name('mon-compte.mot-de-passe.update');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])
@@ -168,6 +180,5 @@ Route::middleware('auth')->group(function () {
         Route::delete('/secteurs/{secteur}', [SecteurController::class, 'destroy'])->name('secteurs.destroy');
     });
 });
-
 
 require __DIR__.'/auth.php';

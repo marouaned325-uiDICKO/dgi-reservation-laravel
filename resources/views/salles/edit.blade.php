@@ -149,9 +149,9 @@
             <input type="file" id="photo" name="photo" accept="image/*" @if (!$salle->photo) required @endif>
             <div class="aide-photo">
                 @if ($salle->photo)
-                    Laissez vide pour conserver la photo actuelle. Image JPG, PNG..., 2 Mo maximum.
+                    Laissez vide pour conserver la photo actuelle. Image JPG, PNG..., 10 Mo maximum.
                 @else
-                    Image obligatoire (JPG, PNG...), 2 Mo maximum.
+                    Image obligatoire (JPG, PNG...), 10 Mo maximum.
                 @endif
             </div>
             <img id="apercuPhoto" class="apercu-photo" alt="Aperçu de la nouvelle photo">
@@ -175,8 +175,8 @@ document.getElementById('photo').addEventListener('change', function () {
         apercu.classList.remove('visible');
         return;
     }
-    if (fichier.size > 2 * 1024 * 1024) {
-        alert('La photo dépasse 2 Mo. Choisissez une image plus légère.');
+    if (fichier.size > 10 * 1024 * 1024) {
+        alert('La photo dépasse 10 Mo. Choisissez une image plus légère.');
         this.value = '';
         apercu.classList.remove('visible');
         return;
@@ -311,4 +311,5 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') msEl
 
 document.addEventListener('DOMContentLoaded', chargerCatalogue);
 </script>
+@include('users._select_recherche')
 @endsection

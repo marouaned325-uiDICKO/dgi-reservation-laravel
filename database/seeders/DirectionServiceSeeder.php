@@ -2,40 +2,38 @@
 
 namespace Database\Seeders;
 
+use App\Models\Direction;
+use App\Models\Service;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Directions et services de la DGI, lus dans database/seeders/data/structures_dgi.csv.
+ * Peut être relancé sans créer de doublons.
+ */
 class DirectionServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        $now = now();
+        $structures = StructuresDgi::charger();
 
-        $structure = [
-            'Direction Générale'                    => ['Secrétariat', 'Cabinet'],
-            'Direction des Grandes Entreprises'     => ['Service de la Fiscalité', 'Service du Contrôle'],
-            'Direction des Moyennes Entreprises'    => ['Service de la Fiscalité', 'Service du Recouvrement'],
-            'Direction des Ressources Humaines'     => ['Service du Personnel', 'Service de la Formation'],
-            "Direction des Systèmes d'Information"  => ['Service Développement', 'Service Réseaux et Maintenance'],
-        ];
+        DB::transaction(function () use ($structures) {
+            Model::unguarded(function () use ($structures) {
+                foreach ($structures['directions'] as $nomDirection => $services) {
+                    $direction = Direction::firstOrCreate(['nom_direction' => $nomDirection]);
 
-        foreach ($structure as $nomDirection => $services) {
-            $direction = DB::table('directions')->where('nom_direction', $nomDirection)->first();
+                    foreach ($services as $nomService) {
+                        Service::firstOrCreate([
+                            'direction_id' => $direction->id,
+                            'nom_service'  => $nomService,
+                        ]);
+                    }
+                }
+            });
+        });
 
-            $directionId = $direction
-                ? $direction->id
-                : DB::table('directions')->insertGetId([
-                    'nom_direction' => $nomDirection,
-                    'created_at'    => $now,
-                    'updated_at'    => $now,
-                ]);
-
-            foreach ($services as $nomService) {
-                DB::table('services')->updateOrInsert(
-                    ['nom_service' => $nomService, 'direction_id' => $directionId],
-                    ['created_at' => $now, 'updated_at' => $now]
-                );
-            }
-        }
+        $this->command?->info(count($structures['directions']) . ' directions et '
+            . array_sum(array_map('count', $structures['directions'])) . ' services enregistrés.');
     }
 }
