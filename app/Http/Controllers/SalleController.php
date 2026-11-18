@@ -95,7 +95,7 @@ class SalleController extends Controller
             'statut' => ['required', Rule::in(['disponible', 'indisponible', 'maintenance'])],
             'equipements' => ['nullable', 'array'],
             'equipements.*' => ['string', 'max:100'],
-            'photo' => [$photoObligatoire ? 'required' : 'nullable', 'image', 'max:2048'],
+            'photo' => [$photoObligatoire ? 'required' : 'nullable', 'image', 'max:10240'],
         ], [
             'direction_id.required' => 'Veuillez choisir une direction.',
             'direction_id.exists' => 'Cette direction est invalide.',
@@ -108,7 +108,7 @@ class SalleController extends Controller
             'statut.in' => 'Le statut sélectionné est invalide.',
             'photo.required' => 'La photo de la salle est obligatoire.',
             'photo.image' => 'Le fichier doit être une image (JPG, PNG...).',
-            'photo.max' => 'La photo ne doit pas dépasser 2 Mo.',
+            'photo.max' => 'La photo ne doit pas dépasser 10 Mo.',
         ]);
     }
 
